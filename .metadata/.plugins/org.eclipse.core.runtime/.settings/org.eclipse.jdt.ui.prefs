@@ -1,0 +1,10 @@
+command=C\:\\Users\\David\\.p2\\pool\\plugins\\org.eclipse.justj.openjdk.hotspot.jre.full.win32.x86_64_15.0.2.v20210201-0955\\jre\\bin\\javadoc.exe
+content_assist_lru_history=<?xml version\="1.0" encoding\="UTF-8" standalone\="no"?><history maxLHS\="100" maxRHS\="10"><lhs name\="java.awt.Shape"><rhs name\="java.awt.geom.RoundRectangle2D$Double"/></lhs><lhs name\="java.awt.image.ImageObserver"><rhs name\="javax.swing.Box"/><rhs name\="javax.swing.JLabel"/><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="java.awt.MenuContainer"><rhs name\="javax.swing.Box"/><rhs name\="javax.swing.JLabel"/><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="java.awt.Component"><rhs name\="javax.swing.Box"/><rhs name\="javax.swing.JLabel"/><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="javax.swing.WindowConstants"><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="javax.accessibility.Accessible"><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="javax.swing.RootPaneContainer"><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="javax.swing.TransferHandler$HasGetTransferHandler"><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="java.awt.Frame"><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="java.awt.Window"><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="java.awt.Container"><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs><lhs name\="javax.swing.JFrame"><rhs name\="JuegoDePalabras.InstructionsGUI"/></lhs></history>
+content_assist_number_of_computers=13
+content_assist_proposals_background=255,255,255
+content_assist_proposals_foreground=0,0,0
+eclipse.preferences.version=1
+org.eclipse.jdt.ui.formatterprofiles.version=20
+spelling_locale_initialized=true
+useAnnotationsPrefPage=true
+useQuickDiffPrefPage=true

@@ -1,0 +1,101 @@
+/*
+ * Author: David Alberto.
+ */
+package JuegoDePalabras;
+
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URI;
+import java.net.URL;
+import java.util.Vector;
+
+import javax.swing.JOptionPane;
+
+// TODO: Auto-generated Javadoc
+/**
+ * The Class TxtFileManager. Useful to manage the content of any text file.
+ */
+public class TxtFileManager {
+	
+	//----------------------------------------------------------------------------------------------------------------------------------
+	//attributes
+	//----------------------------------------------------------------------------------------------------------------------------------
+	
+	/** The file R. */
+	private BufferedReader fileR;
+	
+	/** The words. */
+	private Vector<String> words;
+	
+	//----------------------------------------------------------------------------------------------------------------------------------
+	//constructor
+	//----------------------------------------------------------------------------------------------------------------------------------
+	
+	/**
+	 * Instantiates a new TxtFileManager.
+	 *
+	 * @param inputStream the url where is located the text file
+	 */
+	public TxtFileManager(InputStream inputStream) {
+		try {
+			this.fileR = new BufferedReader(new InputStreamReader(inputStream));
+			this.words = new Vector<String>();
+		} catch (FileNotFoundException e) {
+			JOptionPane.showMessageDialog(null, "Error! File not found.");
+			e.printStackTrace();
+		}
+	}
+	
+	//----------------------------------------------------------------------------------------------------------------------------------
+	//methods
+	//----------------------------------------------------------------------------------------------------------------------------------
+	
+	/**
+	 * Store words in the words vector.
+	 */
+	public void storeWords() {
+		try {
+			String ln;
+			while((ln = fileR.readLine()) != null) {
+				words.add(ln);
+			}
+		} catch (IOException e) {
+			JOptionPane.showMessageDialog(null, "Error! File not found.");
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Gets the word from the words vector.
+	 *
+	 * @param number an index
+	 * @return the word
+	 */
+	public String getWord(int number) {
+		return words.get(number);
+	}
+	
+	/**
+	 * Removes a word from the words vector.
+	 *
+	 * @param number the index of the element
+	 */
+	public void removeWord(int number) {
+		words.remove(number);
+	}
+	
+	/**
+	 * How many words.
+	 *
+	 * @return the number of words from the vector.
+	 */
+	public int howManyWords() {
+		return words.size();
+	}
+	
+}

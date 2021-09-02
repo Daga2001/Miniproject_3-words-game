@@ -1,0 +1,31 @@
+package JuegoDePalabras;
+
+import java.awt.EventQueue;
+
+import javax.swing.JOptionPane;
+import javax.swing.UIManager;
+
+public class WordsMain {
+
+	public static void main(String[] args) {
+		try {
+			String javaLookAndFeel = UIManager.getCrossPlatformLookAndFeelClassName();
+			UIManager.setLookAndFeel(javaLookAndFeel);
+		} 
+		catch (Exception e) {
+			// TODO Auto-generated catch block
+			JOptionPane.showMessageDialog(null, "There was a damage in the JVM", "Error!", JOptionPane.ERROR_MESSAGE);
+		};
+		
+		EventQueue.invokeLater(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				WordsGameGUI mainScreen = new WordsGameGUI();
+			}
+			
+		});
+	}
+	
+}

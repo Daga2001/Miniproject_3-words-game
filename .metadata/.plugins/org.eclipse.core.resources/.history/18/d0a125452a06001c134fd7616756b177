@@ -1,0 +1,721 @@
+package JuegoDePalabras;
+
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Container;
+import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.GridLayout;
+import java.awt.KeyboardFocusManager;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+import javax.swing.BorderFactory;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JPasswordField;
+import javax.swing.JTextArea;
+import javax.swing.JTextField;
+import javax.swing.Timer;
+import javax.swing.border.Border;
+import javax.swing.border.LineBorder;
+
+public class WordsGameGUI extends JFrame{
+
+	//----------------------------------------------------------------------------------------------------------------------------------
+	//attributes
+	//----------------------------------------------------------------------------------------------------------------------------------
+	
+	private Canvas canvas;
+	private Listener listener;
+	private ListenerMouse listenerMouse;
+	private Timer timer;
+	private JButton exit, validateData, createUser, showWords, endSerie, showMenu;
+	private ImageIcon image, icon;
+	private JLabel username, psswd, time;
+	private JFrame loginFrame;
+	private JTextField user;
+	private JPasswordField password;
+	private JFrame myGUI;
+	private Color borderColor;
+	private JPanel words;
+	private boolean gameStarted, airplanePlayed;
+	private int once;
+	private AudioInputStream audioIn;
+	private Clip postClicked, rollOver, rightAnswer, wrongAnswer, fail, airplane, backgroundMusic;
+	private GridBagConstraints constraints;
+	private ControlGame controlGame;
+	private Thread t1;
+	
+	//----------------------------------------------------------------------------------------------------------------------------------
+	//constructor
+	//----------------------------------------------------------------------------------------------------------------------------------
+	
+	public WordsGameGUI() {
+		
+		icon = new ImageIcon(getClass().getClassLoader().getResource("mainIcon.png"));
+		
+		//initialization of GUI
+		initGUI();
+		
+		//config of GUI
+		this.setTitle("Juego de Palabras");
+		this.setUndecorated(false);
+		this.pack();
+		this.setBackground(Color.WHITE);
+		this.setResizable(false);
+		this.setLocationRelativeTo(null);
+		this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		this.setVisible(false);
+		this.setEnabled(false);
+		this.requestFocus();
+		this.setIconImage(icon.getImage());
+		this.addKeyListener(listener);
+		this.validate();
+		
+		//config of LoginFrame
+		loginFrame.setTitle("Login");
+		loginFrame.setUndecorated(false);
+		loginFrame.pack();
+		loginFrame.setBackground(Color.WHITE);
+		loginFrame.setResizable(false);
+		loginFrame.setLocationRelativeTo(null);
+		loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		loginFrame.setVisible(true);
+		loginFrame.validate();
+		loginFrame.requestFocus();
+		loginFrame.addKeyListener(listener);
+		loginFrame.setIconImage(icon.getImage());
+	}
+	
+	//----------------------------------------------------------------------------------------------------------------------------------
+	//methods
+	//----------------------------------------------------------------------------------------------------------------------------------
+	
+	private void initGUI() {
+		
+		//define window icon
+		
+		
+		//make listeners
+		listener = new Listener();
+		listenerMouse = new ListenerMouse();
+		
+		//make other variables
+		timer = new Timer(10, listener);
+		gameStarted = false;
+		airplanePlayed = false;
+		controlGame = new ControlGame();
+		constraints = new GridBagConstraints();
+		myGUI = this;
+		once = 0;
+		borderColor = new Color(0,85,102);
+		t1 = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				
+					airplane.loop(Clip.LOOP_CONTINUOUSLY);
+					while(!controlGame.planeCompletedTravels()) {}
+					airplane.stop();
+					airplanePlayed = true;
+				
+			}
+		});
+		
+		//import audio
+		try {
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("post-click sound effect.wav"));
+			postClicked = AudioSystem.getClip();
+			postClicked.open(audioIn);
+			
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("rollover-sound-effect.wav"));
+			rollOver = AudioSystem.getClip();
+			rollOver.open(audioIn);
+			
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("right answer.wav"));
+			rightAnswer = AudioSystem.getClip();
+			rightAnswer.open(audioIn);
+			
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("wrong.wav"));
+			wrongAnswer = AudioSystem.getClip();
+			wrongAnswer.open(audioIn);
+			
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("fail.wav"));
+			fail = AudioSystem.getClip();
+			fail.open(audioIn);
+			
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("airplane.wav"));
+			airplane = AudioSystem.getClip();
+			airplane.open(audioIn);
+			
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("background music.wav"));
+			backgroundMusic = AudioSystem.getClip();
+			backgroundMusic.open(audioIn);
+		}
+		catch(Exception e) {
+			JOptionPane.showMessageDialog(null, "Error! audio file not found!");
+		}
+		
+		
+		//makeGUI of loginFrame
+		loginFrame = new JFrame();
+		loginFrame.addKeyListener(listener);
+		loginFrame.setLayout(new GridBagLayout());
+		
+		//textfields
+		int spaceForFields = 14;
+		Dimension spaceBtwComponents = new Dimension(0, 10);
+		username = new JLabel("Nombre de Usuario");
+		psswd = new JLabel("Contraseña");
+		user = new JTextField(spaceForFields);
+		password = new JPasswordField(spaceForFields);
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		constraints.gridwidth = 1;
+		loginFrame.add(Box.createRigidArea(spaceBtwComponents), constraints);
+		constraints.gridx = 0;
+		constraints.gridy = 1;
+		constraints.gridwidth = 1;
+		loginFrame.add(username, constraints);
+		constraints.gridx = 1;
+		constraints.gridy = 1;
+		constraints.gridwidth = 1;
+		loginFrame.add(user, constraints);
+		constraints.gridx = 0;
+		constraints.gridy = 2;
+		constraints.gridwidth = 1;
+		loginFrame.add(Box.createRigidArea(spaceBtwComponents), constraints);
+		constraints.gridx = 0;
+		constraints.gridy = 3;
+		constraints.gridwidth = 1;
+		loginFrame.add(psswd, constraints);
+		constraints.gridx = 1;
+		constraints.gridy = 3;
+		constraints.gridwidth = 1;
+		loginFrame.add(password, constraints);
+		constraints.gridx = 0;
+		constraints.gridy = 4;
+		constraints.gridwidth = 1;
+		loginFrame.add(Box.createRigidArea(spaceBtwComponents), constraints);
+		
+		//Button for validation of credentials (not are credentials at all, for example real names or something important)
+		createUser = new Button("Crear Usuario");
+		createUser.addKeyListener(listener);
+		createUser.addActionListener(listener);
+		createUser.addMouseListener(listenerMouse);
+		validateData = new Button("Validar");
+		validateData.addKeyListener(listener);
+		validateData.addActionListener(listener);
+		validateData.addMouseListener(listenerMouse);
+		constraints.gridx = 0;
+		constraints.gridy = 5;
+		constraints.gridwidth = 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		loginFrame.add(validateData, constraints);
+		constraints.gridx = 1;
+		constraints.gridy = 5;
+		constraints.gridwidth = 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		loginFrame.add(createUser, constraints);
+		
+		//makeGUI of WordsGameGUI
+		this.setLayout(new GridBagLayout());
+		
+		//Time
+		LineBorder borderTime = new LineBorder(borderColor, 5, false);
+		Color colorTime = new Color(0,191,230);
+		Color foregroundTime = new Color(0,85,102);
+		time = new Title( String.format( "Tiempo: %s", controlGame.updateTime( timer.getDelay()*1.6 ) ), 25, colorTime, foregroundTime, borderTime);
+		time.setVisible(false);
+		constraints.gridx = 0;
+		constraints.gridy = 2;
+		constraints.gridwidth = 1;
+		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.anchor = GridBagConstraints.CENTER;
+		this.add(time, constraints);
+		
+		//buttons
+		endSerie = new Button("Terminar Serie");
+		endSerie.setVisible(false);
+		endSerie.addActionListener(listener);
+		endSerie.addKeyListener(listener);
+		endSerie.addMouseListener(listenerMouse);
+		showWords = new Button("Palabras Adivinadas");
+		showWords.setVisible(false);
+		showWords.addActionListener(listener);
+		showWords.addKeyListener(listener);
+		showWords.addMouseListener(listenerMouse);
+		constraints.gridx = 0;
+		constraints.gridy = 1;
+		constraints.gridwidth = 2;
+		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.anchor = GridBagConstraints.CENTER;
+		this.add(showWords, constraints);
+		constraints.gridx = 1;
+		constraints.gridy = 2;
+		constraints.gridwidth = 1;
+		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.anchor = GridBagConstraints.CENTER;
+		this.add(endSerie, constraints);
+		exit = new Button("Salir");
+		exit.addActionListener(listener);
+		exit.addKeyListener(listener);
+		exit.addMouseListener(listenerMouse);
+		constraints.gridx = 0;
+		constraints.gridy = 3;
+		constraints.gridwidth = 2;
+		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.anchor = GridBagConstraints.CENTER;
+		this.add(exit, constraints);
+		
+		//menu button
+		showMenu = new Button("volver");
+		showMenu.setVisible(false);
+		showMenu.addActionListener(listener);
+		showMenu.addKeyListener(listener);
+		showMenu.addMouseListener(listenerMouse);
+		constraints.gridx = 0;
+		constraints.gridy = 1;
+		constraints.gridwidth = 2;
+		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		this.add(showMenu, constraints);
+		
+		//showing words
+		Color wordsBackground = new Color(128,212,255);
+		words = new JPanel();
+		words.setVisible(false);
+		words.setBorder(borderTime);
+		words.setBackground(wordsBackground);
+		words.setLayout(new GridBagLayout());
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.anchor = GridBagConstraints.CENTER;
+		JLabel noWords= new JLabel("No has adivinado una palabra aún.");
+		words.add(noWords, constraints);
+		constraints.gridx = 0;
+		constraints.gridy = 2;
+		constraints.gridwidth = 2;
+//		constraints.gridheight = 2;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.anchor = GridBagConstraints.LINE_START;
+		this.add(words, constraints);
+		
+		//canvas
+		canvas = new Canvas(controlGame);
+		canvas.addKeyListener(listener);
+		constraints.gridx = 0;
+		constraints.gridy = 0;
+		constraints.gridwidth = 2;
+		constraints.gridheight = 1;
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.anchor = GridBagConstraints.CENTER;
+		this.add(canvas, constraints);
+	
+		System.out.println(String.format("component: %s", this.getContentPane().getComponent(1)));
+		System.out.println(String.format("number of components: %s", this.getContentPane(), getComponentCount()));
+	}
+	
+	public void showRemainingInterface() {
+		if(once == 0) {
+			showWords.setVisible(true);
+			time.setVisible(true);
+			endSerie.setVisible(true);
+			
+			myGUI.repaint();
+			myGUI.validate();
+			myGUI.pack();
+			myGUI.setLocationRelativeTo(null);
+			once++;
+		}
+	}
+	
+	public void hideRemainingInterface() {
+		once = 0;
+		showWords.setVisible(false);
+		time.setVisible(false);
+		endSerie.setVisible(false);
+		showMenu.setVisible(false);
+		words.setVisible(false);
+		exit.setVisible(true);
+		
+		myGUI.repaint();
+		myGUI.validate();
+		myGUI.pack();
+		myGUI.setLocationRelativeTo(null)	;
+	}
+	
+	public void showWords() {
+		endSerie.setVisible(false);
+		time.setVisible(false);
+		showWords.setVisible(false);
+		exit.setVisible(false);
+		
+		showMenu.setVisible(true);
+		words.setVisible(true);
+		
+		myGUI.repaint();
+		myGUI.validate();
+		myGUI.pack();
+		myGUI.setLocationRelativeTo(null);
+	}
+	
+	public void showMenu() {
+		showMenu.setVisible(false);
+		words.setVisible(false);
+		
+		endSerie.setVisible(true);
+		time.setVisible(true);
+		showWords.setVisible(true);
+		exit.setVisible(true);
+		
+		
+		myGUI.repaint();
+		myGUI.validate();
+		myGUI.pack();
+		myGUI.setLocationRelativeTo(null);
+	}
+	
+	public void addWordToList(String word) {
+		JLabel newWord = new JLabel(word);
+		Font font = new Font(Font.SERIF, Font.BOLD+Font.ITALIC, 20);
+		Color foreground = new Color(0,85,102);
+		newWord.setFont(font);
+		newWord.setForeground(foreground);
+		newWord.setHorizontalAlignment(JLabel.CENTER);
+		constraints.gridx = 0;
+		constraints.gridy = words.getComponentCount();
+		constraints.fill = GridBagConstraints.HORIZONTAL;
+		constraints.anchor = GridBagConstraints.CENTER;
+		words.add(newWord, constraints);
+		
+		System.out.println(String.format("--- words: %s ---", words));
+		System.out.println(String.format("--- properties sus: %s ---", constraints));
+		
+		myGUI.repaint();
+		myGUI.validate();
+		myGUI.pack();
+		myGUI.setLocationRelativeTo(null);
+	}
+	
+	public void validateData() {
+		switch( controlGame.checkCredentials( user.getText(), String.valueOf(password.getPassword()) ) ){
+		case "Both Exist":
+			requestLoadData();
+			controlGame.startGame();
+			gameStarted = true;
+			loginFrame.setVisible(false);
+			loginFrame.setEnabled(false);
+			this.setEnabled(true);
+			this.setVisible(true);
+			break;
+		case "Username Exist": 
+			JOptionPane.showMessageDialog(null, "Error, el usuario y/o contraseña son incorrectos.");
+			break;
+		case "They doesn't exist":
+			JOptionPane.showMessageDialog(null, "Error, el usuario y/o contraseña son incorrectos.");
+			break;
+		case "Not valid Credential/s":
+			JOptionPane.showMessageDialog(null, "La contraseña debe ser de minimo 8 caracteres.");
+			break;
+		}
+		
+	}
+	
+	public void createUser() {
+		switch( controlGame.checkCredentials( user.getText(), String.valueOf(password.getPassword()) ) ){
+		case "Both Exist": 
+			JOptionPane.showMessageDialog(null, "Este usuario ya existe, por favor elija otro.");
+			break;
+		case "Username Exist": 
+			JOptionPane.showMessageDialog(null, "Este usuario ya existe, por favor elija otro.");
+			break;
+		case "They doesn't exist":
+			JOptionPane.showMessageDialog(null, "Creando usuario.");
+			controlGame.startGame();
+			gameStarted = true;
+			loginFrame.setVisible(false);
+			loginFrame.setEnabled(false);
+			this.setEnabled(true);
+			this.setVisible(true);
+			break;
+		case "Not valid Credential/s":
+			JOptionPane.showMessageDialog(null, "La contraseña debe ser de minimo 8 caracteres.");
+			break;
+		}
+	}
+	
+	public void checkAnswer() {
+		switch(controlGame.checkAnswer()) {
+		case "Next Level":
+						words.removeAll();
+		    			controlGame.eraseAnswer();
+		    			hideRemainingInterface();
+		    			airplanePlayed = false;
+						break;
+		case "Next Serie":
+						addWordToList(controlGame.getNewWordGuessed());
+						controlGame.eraseAnswer();
+						hideRemainingInterface();
+						airplanePlayed = false;
+						break;
+		case "Correct": 
+						addWordToList(controlGame.getNewWordGuessed());
+						controlGame.eraseAnswer();
+						break;
+		case "Already Guessed":
+		    			JOptionPane.showMessageDialog(null, "Word already guessed!");
+						break;
+		case "Incorrect": 
+						JOptionPane.showMessageDialog(null, "Wrong!");
+						break;
+		case "Unreachable":
+						restartGame();
+						break;
+		}
+	}
+	
+	public void requestLoadData() {
+		if(controlGame.getScore() != 0) {
+			image = new ImageIcon(getClass().getClassLoader().getResource("load-game.png"));
+			String tittle = "Load screen";
+			String body = "<html><body style='text-align: center;'>Le gustaría cargar su progreso anterior?</body></html>";
+			int answer = JOptionPane.showConfirmDialog(null, body, tittle, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, image);
+			switch(answer) {
+			case JOptionPane.YES_OPTION:
+										break;
+			case JOptionPane.NO_OPTION:
+										controlGame.resetData();
+										break;
+			case JOptionPane.CLOSED_OPTION:
+										break;
+			}
+		}
+	}
+	
+	public void requestSaveData() {
+		if(controlGame.getScore() != controlGame.getOldScore() || controlGame.getLevel() != controlGame.getOldLevel()) {
+			JOptionPane.showMessageDialog(null, "Good Luck for next time!");
+			image = new ImageIcon(getClass().getClassLoader().getResource("save.png"));
+			String tittle = "Save screen";
+			String body = "<html><body style='text-align: center;'>Le gustaría guardar su progreso?</body></html>";
+			int answer = JOptionPane.showConfirmDialog(null, body, tittle, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, image);
+			switch(answer) {
+			case JOptionPane.YES_OPTION:
+										controlGame.updateData();
+										break;
+			case JOptionPane.NO_OPTION:
+										break;
+			case JOptionPane.CLOSED_OPTION:
+										break;
+			}
+		}
+		System.exit(0);
+	}
+	
+	public void updateTime() {
+		time.setText( String.format( "Tiempo: %s", controlGame.updateTime( timer.getDelay()*1.6 ) ) );
+	}
+	
+	public void restartGame() {
+		image = new ImageIcon(getClass().getClassLoader().getResource("restart.png"));
+		String tittle = "Restart screen";
+		String body = "<html><body style='text-align: center;'>Le gustaría volver a jugar desde el principio?</body></html>";
+		int answer = JOptionPane.showConfirmDialog(null, body, tittle, JOptionPane.YES_NO_OPTION, JOptionPane.QUESTION_MESSAGE, image);
+		switch(answer) {
+		case JOptionPane.YES_OPTION:
+									controlGame.restartGame();
+									controlGame.eraseAnswer();
+									hideRemainingInterface();
+									break;
+		case JOptionPane.NO_OPTION:	
+									requestSaveData();
+									break;
+		case JOptionPane.CLOSED_OPTION:
+									break;
+		}
+	}
+	
+	private class Listener extends KeyAdapter implements ActionListener {
+		
+		/**
+	     * Invoked when a key has been pressed.
+	     */
+	    public void keyPressed(KeyEvent e) {
+//	    	System.out.println(KeyEvent.getKeyText(e.getKeyCode()));
+	    	if(controlGame.AllWordsWereUsed() && gameStarted) {
+		    	if(KeyEvent.getKeyText(e.getKeyCode()) == "Enter") {
+		    		checkAnswer();
+		    	}
+		    	if(KeyEvent.getKeyText(e.getKeyCode()) == "Backspace") {
+		    		controlGame.eraseCharOfAnswer();
+		    	}
+		    	if(KeyEvent.getKeyText(e.getKeyCode()) == "Space") {
+		    		controlGame.addCharToAnswer(" ");
+		    	}
+		    	else {
+		    		controlGame.addCharToAnswer(KeyEvent.getKeyText(e.getKeyCode()));
+		    	}
+	    	}
+	    	if(KeyEvent.getKeyText(e.getKeyCode()) == "Left" && gameStarted) {
+	    		canvas.changeRectX(-25);
+	    	}
+	    	if(!gameStarted) {
+		    	if(KeyEvent.getKeyText(e.getKeyCode()) == "Enter") {
+		    		if(validateData.isFocusOwner()) {
+		    			validateData();
+		    		}
+		    		if(createUser.isFocusOwner()) {
+		    			createUser();
+		    		}
+		    	}
+		    	if(KeyEvent.getKeyText(e.getKeyCode()) == "Right") {
+		    		System.out.println(String.format("%s ??", KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == validateData));
+		    		if(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == validateData) {
+		    			createUser.requestFocus();
+		    			System.out.println(String.format("%s ??", KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == validateData));
+		    		}
+		    		if(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == createUser) {
+		    			validateData.requestFocus();
+		    		}
+		    		else {
+		    			validateData.requestFocus();
+		    		}
+		    	}
+		    	if(KeyEvent.getKeyText(e.getKeyCode()) == "Left") {
+		    		System.out.println(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner());
+		    		if(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == validateData) {
+		    			createUser.requestFocus();
+		    		}
+		    		if(KeyboardFocusManager.getCurrentKeyboardFocusManager().getFocusOwner() == createUser) {
+		    			validateData.requestFocus();
+		    		}
+		    		else {
+		    			createUser.requestFocus();
+		    		}
+		    	}
+	    	}
+	    }
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if(e.getSource() == timer) {
+				if(gameStarted) {
+					if(controlGame.timeUp()) {
+						restartGame();
+					}
+					if(!controlGame.planeCompletedTravels()) {
+						if(!airplanePlayed) {
+							t1.start();
+							airplanePlayed = true;
+						}
+						canvas.changeRectX(-2);
+					}
+					else {
+						updateTime();
+						showRemainingInterface();
+					}
+				}
+			}
+			if(e.getSource() == exit) {
+				requestSaveData();
+			}
+			if(e.getSource() == validateData) {
+				validateData();
+				System.out.println(String.format("Before: %s", words));
+				words.removeAll();
+				System.out.println(String.format("After: %s", words));
+				backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+				timer.start();
+			}
+			if(e.getSource() == createUser) {
+				createUser();
+				System.out.println(String.format("Before: %s", words));
+				words.removeAll();
+				System.out.println(String.format("After: %s", words));
+				backgroundMusic.loop(Clip.LOOP_CONTINUOUSLY);
+				timer.start();
+			}
+			if(e.getSource() == endSerie) {
+				if(controlGame.isReachableNextSerie() ) {
+					if(controlGame.nextSerie() == "Next Level") words.removeAll();
+					controlGame.eraseAnswer();
+					hideRemainingInterface();
+					airplanePlayed = false;
+				}
+				else {
+					restartGame();
+				}
+			}
+			if(e.getSource() == showWords) {
+				showWords();
+			}
+			if(e.getSource() == showMenu) {
+				showMenu();
+			}
+		}
+		
+	}
+	
+	private class ListenerMouse extends MouseAdapter implements MouseListener{
+		
+		/**
+		 * Mouse pressed.
+		 *
+		 * @param e the e
+		 */
+		public void mousePressed(MouseEvent e) {
+			if(e.getSource() == validateData || e.getSource() == createUser) {
+				postClicked.setFramePosition(0);
+				postClicked.start();
+			}
+		}
+		
+		/**
+		 * Mouse exited.
+		 *
+		 * @param e the e
+		 */
+		public void mouseExited(MouseEvent e) {
+			if(e.getSource().getClass() == Button.class) {
+				e.getComponent().setBackground(new Color(51,153,255));
+			}
+		}
+
+	    /**
+    	 * Mouse entered.
+    	 *
+    	 * @param e the e
+    	 */
+    	public void mouseEntered(MouseEvent e) {
+	    	if(e.getSource().getClass() == Button.class) {
+	    		rollOver.stop();
+	    		rollOver.setMicrosecondPosition(0);
+	    		rollOver.start();
+	    		e.getComponent().setBackground(new Color(51,221,255));
+	    	}
+	    }
+	}
+	
+}

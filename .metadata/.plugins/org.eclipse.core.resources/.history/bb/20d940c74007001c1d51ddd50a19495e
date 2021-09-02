@@ -1,0 +1,90 @@
+package JuegoDePalabras;
+
+import java.awt.Color;
+import java.awt.Cursor;
+import java.awt.Font;
+
+import javax.swing.JButton;
+import javax.swing.border.LineBorder;
+
+public class Button extends JButton {
+	
+	private Clip postClicked, rollOver, backgroundMusic;
+	
+	public Button(String text) {
+		
+		Color colorButtons = new Color(51,153,255);
+		Color foregroundButtons = new Color(0,85,102);
+		Color borderColor = foregroundButtons;
+		LineBorder borderButtons = new LineBorder(borderColor, 5, false);
+		Font fontButtons= new Font(Font.SERIF, Font.BOLD+Font.ITALIC, 25);
+		
+		this.setText(text);
+		this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+		this.setBackground(colorButtons);
+		this.setForeground(foregroundButtons);
+		this.setBorder(borderButtons);
+		this.setFocusPainted(false);
+		this.setFont(fontButtons);
+		
+		//audio
+		try {
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("post-click sound effect.wav"));
+			postClicked = AudioSystem.getClip();
+			postClicked.open(audioIn);
+			
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("rollover-sound-effect.wav"));
+			rollOver = AudioSystem.getClip();
+			rollOver.open(audioIn);
+			
+			audioIn = AudioSystem.getAudioInputStream(getClass().getClassLoader().getResource("background music.wav"));
+			backgroundMusic = AudioSystem.getClip();
+			backgroundMusic.open(audioIn);
+		}
+		catch(Exception e) {
+			JOptionPane.showMessageDialog(null, "Error! audio file not found!");
+		}
+		
+	}
+	
+private class ListenerMouse extends MouseAdapter{
+		
+		/**
+		 * Mouse pressed.
+		 *
+		 * @param e the e
+		 */
+		public void mousePressed(MouseEvent e) {
+			if(e.getSource() == validateData || e.getSource() == createUser) {
+				postClicked.setFramePosition(0);
+				postClicked.start();
+			}
+		}
+		
+		/**
+		 * Mouse exited.
+		 *
+		 * @param e the e
+		 */
+		public void mouseExited(MouseEvent e) {
+			if(e.getSource().getClass() == Button.class) {
+				e.getComponent().setBackground(new Color(51,153,255));
+			}
+		}
+
+	    /**
+    	 * Mouse entered.
+    	 *
+    	 * @param e the e
+    	 */
+    	public void mouseEntered(MouseEvent e) {
+	    	if(e.getSource().getClass() == Button.class) {
+	    		rollOver.stop();
+	    		rollOver.setMicrosecondPosition(0);
+	    		rollOver.start();
+	    		e.getComponent().setBackground(new Color(77,225,255));
+	    	}
+	    }
+	}
+	
+}

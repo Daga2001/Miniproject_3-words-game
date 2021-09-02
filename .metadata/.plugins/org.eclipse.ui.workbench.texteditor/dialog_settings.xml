@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<section name="Workbench">
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
+		<item key="selection" value="setWordsToShow"/>
+		<item key="wrap" value="true"/>
+		<item key="casesensitive" value="false"/>
+		<item key="wholeword" value="false"/>
+		<item key="incremental" value="false"/>
+		<item key="isRegEx" value="false"/>
+		<list key="findhistory">
+			<item value="setWordsToShow"/>
+			<item value="createins"/>
+			<item value="closedbs"/>
+			<item value="close"/>
+			<item value="closes"/>
+			<item value="while"/>
+			<item value="create"/>
+			<item value="controlgame"/>
+			<item value="changeWord"/>
+			<item value="isWordFound"/>
+			<item value="AllWordsWereUsed"/>
+			<item value="setWordsWereShown"/>
+			<item value="JOption"/>
+			<item value="try"/>
+			<item value="trye"/>
+		</list>
+		<list key="replacehistory">
+			<item value=""/>
+			<item value="instructionPng"/>
+			<item value="instructionPNG"/>
+			<item value="showRemainingInterface"/>
+			<item value="AllWordsWereUsed"/>
+		</list>
+	</section>
+	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
+		<item key="DIALOG_X_ORIGIN" value="1021"/>
+		<item key="DIALOG_Y_ORIGIN" value="334"/>
+		<item key="DIALOG_WIDTH" value="333"/>
+		<item key="DIALOG_HEIGHT" value="402"/>
+		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
+	</section>
+</section>
